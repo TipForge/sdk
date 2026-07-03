@@ -38,6 +38,34 @@ export interface UpdateUserRequest {
 }
 
 /**
+ * Wallet entity
+ */
+export interface Wallet {
+  id: string;
+  userId: string;
+  publicKey: string;
+  name: string | null;
+  verified: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+/**
+ * Wallet create request
+ */
+export interface CreateWalletRequest {
+  publicKey: string;
+  name?: string;
+}
+
+/**
+ * Wallet update request
+ */
+export interface UpdateWalletRequest {
+  name?: string;
+}
+
+/**
  * Creator entity
  */
 export interface Creator {
