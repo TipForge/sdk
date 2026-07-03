@@ -16,8 +16,8 @@
     }
   },
   "scripts": {
-    "dev": "tsc --watch",
-    "build": "tsc",
+    "dev": "tsup --watch",
+    "build": "tsup",
     "lint": "eslint src --ext .ts,.tsx",
     "format": "prettier --write src",
     "test": "vitest run",
@@ -35,7 +35,8 @@
     "prettier": "^3.3.3",
     "react": "^18.3.1",
     "typescript": "^5.4.5",
-    "vitest": "^1.6.0"
+    "vitest": "^1.6.0",
+    "tsup": "^8.0.2"
   },
   "peerDependencies": {
     "react": "^18.0.0"
