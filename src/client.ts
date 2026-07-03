@@ -5,8 +5,9 @@
  * Handles authentication, request/response handling, and error management.
  */
 
-import { HttpClient } from './http/http-client';
+import { HttpClient, RequestOptions } from './http/http-client';
 import { getConfig } from './config';
+import { ApiResponse } from './types/api';
 
 export interface ClientConfig {
   baseUrl: string;
@@ -54,6 +55,27 @@ export class TipForgeClient {
     this.token = undefined;
     this.config.token = undefined;
     this.httpClient.removeHeader('Authorization');
+  }
+
+  /**
+   * Make request to backend API
+   */
+  async request<T = unknown>(
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
+    path: string,
+    body?: unknown,
+    options?: Partial<RequestOptions>
+  ): Promise<ApiResponse<T>> {
+    try {
+      const data = await this.httpClient.request<ApiResponse<T>>(path, {
+        method,
+        body: body as Record<string, unknown>,
+        ...options,
+      });
+      return data;
+    } catch (error) {
+      throw error;
+    }
   }
 
   /**
