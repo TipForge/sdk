@@ -71,3 +71,8 @@ export {
   groupTransactionsByCreator,
   enrichTransactionHistory,
 } from './utils/transaction-normalizers';
+
+// Re-export client method types
+export type { BalanceInfo, AccountBalance } from './client/balance';
+export type { VerificationStatus } from './client/verification';
+export type { SessionInfo } from './client/auth';
