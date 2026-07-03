@@ -13,5 +13,61 @@ export { TipForgeClient } from './client';
 // Re-export types
 export type { ApiResponse, ApiError, ClientConfig } from './types';
 
+// Re-export domain models
+export type {
+  User,
+  UserProfile,
+  UpdateUserRequest,
+  Wallet,
+  CreateWalletRequest,
+  UpdateWalletRequest,
+  Creator,
+  CreatorWithUser,
+  CreatorProfile,
+  CreateCreatorRequest,
+  UpdateCreatorRequest,
+  Transaction,
+  TransactionWithDetails,
+  TransactionHistory,
+  TransactionStats,
+  TipRequest,
+  CreateTipRequest,
+} from './types';
+
 // Re-export utils
 export { ApiErrorHandler, RequestValidator } from './utils';
+
+// Re-export mappers
+export {
+  CreatorMapper,
+  UserMapper,
+  TransactionMapper,
+  WalletMapper,
+  ResponseMapper,
+} from './utils/mappers';
+
+// Re-export normalizers
+export {
+  normalizeCreatorProfile,
+  normalizeCreator,
+  normalizeCreators,
+  normalizeUser,
+  normalizeWallet,
+  normalizeWallets,
+  normalizeTransaction,
+  normalizeTransactions,
+  normalizeTransactionHistory,
+} from './utils/normalizers';
+
+// Re-export transaction normalizers
+export {
+  normalizeTransactionHistoryResponse,
+  calculatePaginationMetadata,
+  normalizeTransactionWithDetails,
+  normalizeTransactionsWithDetails,
+  calculateTransactionStats,
+  filterTransactionsByStatus,
+  filterTransactionsByDateRange,
+  groupTransactionsByCreator,
+  enrichTransactionHistory,
+} from './utils/transaction-normalizers';
