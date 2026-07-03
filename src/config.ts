@@ -1,0 +1,44 @@
+/**
+ * SDK Configuration
+ *
+ * Handles environment-specific configuration.
+ */
+
+export interface SdkConfig {
+  apiUrl: string;
+  timeout: number;
+  retryAttempts: number;
+  retryDelay: number;
+  debug: boolean;
+}
+
+const DEFAULT_CONFIG: SdkConfig = {
+  apiUrl: process.env.TIPFORGE_API_URL || 'http://localhost:3000',
+  timeout: parseInt(process.env.TIPFORGE_TIMEOUT || '30000', 10),
+  retryAttempts: parseInt(process.env.TIPFORGE_RETRY_ATTEMPTS || '3', 10),
+  retryDelay: parseInt(process.env.TIPFORGE_RETRY_DELAY || '1000', 10),
+  debug: process.env.TIPFORGE_DEBUG === 'true',
+};
+
+let config: SdkConfig = { ...DEFAULT_CONFIG };
+
+/**
+ * Get current SDK configuration
+ */
+export function getConfig(): SdkConfig {
+  return { ...config };
+}
+
+/**
+ * Update SDK configuration
+ */
+export function setConfig(partialConfig: Partial<SdkConfig>): void {
+  config = { ...config, ...partialConfig };
+}
+
+/**
+ * Reset configuration to defaults
+ */
+export function resetConfig(): void {
+  config = { ...DEFAULT_CONFIG };
+}
