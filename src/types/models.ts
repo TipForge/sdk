@@ -111,6 +111,21 @@ export interface CreateCreatorRequest {
 }
 
 /**
+ * Transaction entity
+ */
+export interface Transaction {
+  id: string;
+  fromUserId: string;
+  creatorId: string;
+  amount: number;
+  message: string | null;
+  status: 'pending' | 'confirmed' | 'failed';
+  stellarTxHash?: string | null;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+/**
  * Creator update request
  */
 export interface UpdateCreatorRequest {
@@ -118,4 +133,32 @@ export interface UpdateCreatorRequest {
   bio?: string;
   avatar?: string;
   isPublic?: boolean;
+}
+
+/**
+ * Transaction with user information
+ */
+export interface TransactionWithDetails extends Transaction {
+  fromUser: User;
+  creator: Creator;
+}
+
+/**
+ * Transaction history response
+ */
+export interface TransactionHistory {
+  transactions: Transaction[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+/**
+ * Transaction statistics
+ */
+export interface TransactionStats {
+  totalTransactions: number;
+  totalAmount: number;
+  averageAmount: number;
+  lastTransactionDate: string | null;
 }
