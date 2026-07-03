@@ -1,0 +1,105 @@
+/**
+ * Wallet Methods
+ *
+ * SDK methods for wallet operations.
+ */
+
+import { Wallet, CreateWalletRequest, UpdateWalletRequest } from '../types/models';
+import { normalizeWallet, normalizeWallets } from '../utils/normalizers';
+import { TipForgeClient } from '../client';
+
+/**
+ * Connect a wallet to user account
+ */
+export async function connectWallet(
+  this: TipForgeClient,
+  data: CreateWalletRequest
+): Promise<Wallet> {
+  const response = await this.request('POST', '/wallets', data);
+
+  if (!response.success || !response.data) {
+    throw new Error('Failed to connect wallet');
+  }
+
+  return normalizeWallet(response.data);
+}
+
+/**
+ * Disconnect a wallet from user account
+ */
+export async function disconnectWallet(this: TipForgeClient, walletId: string): Promise<void> {
+  const response = await this.request('DELETE', `/wallets/${walletId}`);
+
+  if (!response.success) {
+    throw new Error(`Failed to disconnect wallet: ${walletId}`);
+  }
+}
+
+/**
+ * Get user's wallets
+ */
+export async function getWallets(this: TipForgeClient, userId: string): Promise<Wallet[]> {
+  const response = await this.request('GET', `/users/${userId}/wallets`);
+
+  if (!response.success || !response.data) {
+    throw new Error(`Failed to fetch wallets for user: ${userId}`);
+  }
+
+  return normalizeWallets(Array.isArray(response.data) ? response.data : []);
+}
+
+/**
+ * Get wallet by ID
+ */
+export async function getWallet(this: TipForgeClient, walletId: string): Promise<Wallet> {
+  const response = await this.request('GET', `/wallets/${walletId}`);
+
+  if (!response.success || !response.data) {
+    throw new Error(`Failed to fetch wallet: ${walletId}`);
+  }
+
+  return normalizeWallet(response.data);
+}
+
+/**
+ * Update wallet details
+ */
+export async function updateWallet(
+  this: TipForgeClient,
+  walletId: string,
+  data: UpdateWalletRequest
+): Promise<Wallet> {
+  const response = await this.request('PATCH', `/wallets/${walletId}`, data);
+
+  if (!response.success || !response.data) {
+    throw new Error(`Failed to update wallet: ${walletId}`);
+  }
+
+  return normalizeWallet(response.data);
+}
+
+/**
+ * Verify wallet ownership (for Stellar wallets)
+ */
+export async function verifyWallet(this: TipForgeClient, walletId: string): Promise<Wallet> {
+  const response = await this.request('POST', `/wallets/${walletId}/verify`);
+
+  if (!response.success || !response.data) {
+    throw new Error(`Failed to verify wallet: ${walletId}`);
+  }
+
+  return normalizeWallet(response.data);
+}
+
+/**
+ * Get wallet balance
+ */
+export async function getBalance(this: TipForgeClient, walletId: string): Promise<number> {
+  const response = await this.request('GET', `/wallets/${walletId}/balance`);
+
+  if (!response.success || response.data === undefined) {
+    throw new Error(`Failed to fetch wallet balance: ${walletId}`);
+  }
+
+  return Number(response.data);
+}
