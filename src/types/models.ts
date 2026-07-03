@@ -5,6 +5,39 @@
  */
 
 /**
+ * User/Fan entity
+ */
+export interface User {
+  id: string;
+  email: string;
+  name: string | null;
+  role: 'fan' | 'creator' | 'admin';
+  verified: boolean;
+  avatar?: string | null;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+/**
+ * User profile response
+ */
+export interface UserProfile extends User {
+  stats?: {
+    totalTipsSent: number;
+    totalSpent: number;
+    creatorsSupported: number;
+  };
+}
+
+/**
+ * User update request
+ */
+export interface UpdateUserRequest {
+  name?: string;
+  avatar?: string;
+}
+
+/**
  * Creator entity
  */
 export interface Creator {
