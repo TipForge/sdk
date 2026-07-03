@@ -6,6 +6,7 @@
  */
 
 import { ApiError } from '../types';
+import { InterceptorManager } from './interceptors';
 
 export interface RequestOptions {
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -20,6 +21,7 @@ export class HttpClient {
   private defaultHeaders: Record<string, string>;
   private timeout: number;
   private retryAttempts: number;
+  private interceptors: InterceptorManager;
 
   constructor(
     baseUrl: string,
@@ -36,6 +38,14 @@ export class HttpClient {
       'Content-Type': 'application/json',
       ...options?.headers,
     };
+    this.interceptors = new InterceptorManager();
+  }
+
+  /**
+   * Get interceptor manager
+   */
+  getInterceptors(): InterceptorManager {
+    return this.interceptors;
   }
 
   /**
@@ -57,18 +67,22 @@ export class HttpClient {
    */
   async request<T>(path: string, options: RequestOptions): Promise<T> {
     const url = `${this.baseUrl}${path}`;
-    const headers = { ...this.defaultHeaders, ...options.headers };
+
+    // Execute request interceptors
+    let finalOptions = await this.interceptors.executeRequestInterceptors(options);
+
+    const headers = { ...this.defaultHeaders, ...finalOptions.headers };
 
     let lastError: Error | null = null;
-    const attempts = options.retries ?? this.retryAttempts;
+    const attempts = finalOptions.retries ?? this.retryAttempts;
 
     for (let attempt = 0; attempt < attempts; attempt++) {
       try {
         const response = await fetch(url, {
-          method: options.method,
+          method: finalOptions.method,
           headers,
-          body: options.body ? JSON.stringify(options.body) : undefined,
-          signal: AbortSignal.timeout(options.timeout ?? this.timeout),
+          body: finalOptions.body ? JSON.stringify(finalOptions.body) : undefined,
+          signal: AbortSignal.timeout(finalOptions.timeout ?? this.timeout),
         });
 
         if (!response.ok) {
@@ -76,9 +90,15 @@ export class HttpClient {
           throw new ApiError(response.status, error.error || 'Request failed', error.code);
         }
 
-        return (await response.json()) as T;
+        const data = (await response.json()) as T;
+
+        // Execute response interceptors
+        return await this.interceptors.executeResponseInterceptors(data);
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
+
+        // Execute error interceptors
+        await this.interceptors.executeErrorInterceptors(lastError);
 
         // Don't retry on client errors (4xx)
         if (error instanceof ApiError && error.statusCode >= 400 && error.statusCode < 500) {
