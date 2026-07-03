@@ -8,6 +8,14 @@
 import { HttpClient, RequestOptions } from './http/http-client';
 import { getConfig } from './config';
 import { ApiResponse } from './types/api';
+import { Creator, Wallet, Transaction, User } from './types/models';
+import * as creatorMethods from './client/creators';
+import * as walletMethods from './client/wallets';
+import * as transactionMethods from './client/transactions';
+import * as historyMethods from './client/history';
+import * as balanceMethods from './client/balance';
+import * as verificationMethods from './client/verification';
+import * as authMethods from './client/auth';
 
 export interface ClientConfig {
   baseUrl: string;
@@ -37,6 +45,66 @@ export class TipForgeClient {
     if (this.token) {
       this.httpClient.setHeader('Authorization', `Bearer ${this.token}`);
     }
+
+    // Bind methods
+    this.bindMethods();
+  }
+
+  /**
+   * Bind all client methods
+   */
+  private bindMethods(): void {
+    // Creator methods
+    this.getCreator = creatorMethods.getCreator.bind(this);
+    this.listCreators = creatorMethods.listCreators.bind(this);
+    this.getCreatorProfile = creatorMethods.getCreatorProfile.bind(this);
+    this.verifyCreator = verificationMethods.verifyCreator.bind(this);
+
+    // Wallet methods
+    this.connectWallet = walletMethods.connectWallet.bind(this);
+    this.disconnectWallet = walletMethods.disconnectWallet.bind(this);
+    this.getWallets = walletMethods.getWallets.bind(this);
+    this.getWallet = walletMethods.getWallet.bind(this);
+    this.updateWallet = walletMethods.updateWallet.bind(this);
+    this.verifyWallet = verificationMethods.verifyWallet.bind(this);
+    this.getWalletBalance = balanceMethods.getWalletBalance.bind(this);
+
+    // Transaction methods
+    this.createTip = transactionMethods.createTip.bind(this);
+    this.getTipStatus = transactionMethods.getTipStatus.bind(this);
+    this.getTransactionHistory = transactionMethods.getTransactionHistory.bind(this);
+    this.getUserTipsSent = transactionMethods.getUserTipsSent.bind(this);
+    this.getCreatorTipsReceived = transactionMethods.getCreatorTipsReceived.bind(this);
+    this.retryTransaction = transactionMethods.retryTransaction.bind(this);
+
+    // History methods
+    this.getFullTransactionHistory = historyMethods.getFullTransactionHistory.bind(this);
+    this.getTransactionStats = historyMethods.getTransactionStats.bind(this);
+    this.getCreatorEarnings = historyMethods.getCreatorEarnings.bind(this);
+    this.exportTransactionHistory = historyMethods.exportTransactionHistory.bind(this);
+
+    // Balance methods
+    this.getBalance = balanceMethods.getBalance.bind(this);
+    this.getCreatorPendingPayout = balanceMethods.getCreatorPendingPayout.bind(this);
+    this.canPayout = balanceMethods.canPayout.bind(this);
+    this.getAccountSummary = balanceMethods.getAccountSummary.bind(this);
+
+    // Verification methods
+    this.requestCreatorVerification = verificationMethods.requestCreatorVerification.bind(this);
+    this.getCreatorVerificationStatus = verificationMethods.getCreatorVerificationStatus.bind(this);
+    this.getWalletVerificationStatus = verificationMethods.getWalletVerificationStatus.bind(this);
+    this.requestWalletVerificationChallenge =
+      verificationMethods.requestWalletVerificationChallenge.bind(this);
+    this.isTransactionVerified = verificationMethods.isTransactionVerified.bind(this);
+
+    // Auth methods
+    this.refreshSession = authMethods.refreshSession.bind(this);
+    this.validateSession = authMethods.validateSession.bind(this);
+    this.getCurrentUser = authMethods.getCurrentUser.bind(this);
+    this.logout = authMethods.logout.bind(this);
+    this.isAuthenticated = authMethods.isAuthenticated.bind(this);
+    this.extendSession = authMethods.extendSession.bind(this);
+    this.getSessionExpiry = authMethods.getSessionExpiry.bind(this);
   }
 
   /**
@@ -91,4 +159,55 @@ export class TipForgeClient {
   getConfig(): Readonly<ClientConfig> {
     return { ...this.config };
   }
+
+  // Creator methods
+  declare getCreator: (creatorId: string) => Promise<Creator>;
+  declare listCreators: (options?: any) => Promise<any>;
+  declare getCreatorProfile: (username: string) => Promise<any>;
+  declare verifyCreator: (creatorId: string) => Promise<Creator>;
+
+  // Wallet methods
+  declare connectWallet: (data: any) => Promise<Wallet>;
+  declare disconnectWallet: (walletId: string) => Promise<void>;
+  declare getWallets: (userId: string) => Promise<Wallet[]>;
+  declare getWallet: (walletId: string) => Promise<Wallet>;
+  declare updateWallet: (walletId: string, data: any) => Promise<Wallet>;
+  declare verifyWallet: (walletId: string, proof: string) => Promise<Wallet>;
+  declare getWalletBalance: (walletId: string) => Promise<any>;
+
+  // Transaction methods
+  declare createTip: (data: any) => Promise<Transaction>;
+  declare getTipStatus: (transactionId: string) => Promise<Transaction>;
+  declare getTransactionHistory: (options?: any) => Promise<any>;
+  declare getUserTipsSent: (userId: string, options?: any) => Promise<any>;
+  declare getCreatorTipsReceived: (creatorId: string, options?: any) => Promise<any>;
+  declare retryTransaction: (transactionId: string) => Promise<Transaction>;
+
+  // History methods
+  declare getFullTransactionHistory: (options?: any) => Promise<any>;
+  declare getTransactionStats: (userId?: string) => Promise<any>;
+  declare getCreatorEarnings: (creatorId: string) => Promise<any>;
+  declare exportTransactionHistory: (options?: any) => Promise<string>;
+
+  // Balance methods
+  declare getBalance: (userId: string) => Promise<any>;
+  declare getCreatorPendingPayout: (creatorId: string) => Promise<any>;
+  declare canPayout: (creatorId: string) => Promise<boolean>;
+  declare getAccountSummary: () => Promise<any>;
+
+  // Verification methods
+  declare requestCreatorVerification: (creatorId: string, data: any) => Promise<any>;
+  declare getCreatorVerificationStatus: (creatorId: string) => Promise<any>;
+  declare getWalletVerificationStatus: (walletId: string) => Promise<any>;
+  declare requestWalletVerificationChallenge: (walletId: string) => Promise<any>;
+  declare isTransactionVerified: (transactionId: string) => Promise<boolean>;
+
+  // Auth methods
+  declare refreshSession: () => Promise<any>;
+  declare validateSession: () => Promise<User>;
+  declare getCurrentUser: () => Promise<User>;
+  declare logout: () => Promise<void>;
+  declare isAuthenticated: () => Promise<boolean>;
+  declare extendSession: () => Promise<any>;
+  declare getSessionExpiry: () => Promise<any>;
 }
